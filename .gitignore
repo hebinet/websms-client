@@ -1,2 +1,8 @@
 /.idea/
 /vendor/
+node_modules
+build
+package-lock.json
+composer.lock
+coverage
+.phpunit.result.cache

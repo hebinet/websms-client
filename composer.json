@@ -1,20 +1,44 @@
 {
-    "name": "websms-com/websmscom-php",
-    "description": "A lightweight PHP-client-library for using websms.com SMS services.",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Gerd Reifenauer",
-            "email": "gerd.reifenauer@websms.com"
-        }
-    ],
-    "require": {
-        "php": ">=5.2"
+  "name": "websms-com/websmscom-php",
+  "description": "A lightweight PHP-client-library for using websms.com SMS services.",
+  "type": "library",
+  "homepage": "https://github.com/hebinet/websmscom-php",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Markus Hebenstreit",
+      "email": "office@hebinet.at",
+      "homepage": "https://www.hebinet.at",
+      "role": "Developer"
     },
-    "autoload": {
-        "classmap": [
-            "WebSmsCom_Toolkit.inc"
-        ]
+    {
+      "name": "Gerd Reifenauer",
+      "email": "gerd.reifenauer@websms.com"
     }
+  ],
+  "require": {
+    "php": "^7.1",
+    "guzzlehttp/guzzle": "^6.3",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.5",
+    "vlucas/phpdotenv": "^3.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "WebSms\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "WebSms\\tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit"
+  },
+  "config": {
+    "sort-packages": true
+  }
 }
