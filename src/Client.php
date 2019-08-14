@@ -74,6 +74,10 @@ class Client
      * @var bool
      */
     private $sslVerifyHost = true;
+    /**
+     * @var array
+     */
+    private $guzzleOptions = [];
 
 
     /**
@@ -95,12 +99,10 @@ class Client
         $this->initUrl($url);
 
         if ((strlen($this->host) < 4)) {
-            if ($mode === AuthenticationMode::USER_PW && (!$usernameOrAccessToken || !$password) || $mode === AuthenticationMode::ACCESS_TOKEN && !$usernameOrAccessToken) {
-                throw new ParameterValidationException("Invalid call of sms.at gateway class. Check arguments.");
-            }
+            throw new ParameterValidationException("Invalid call of sms.at gateway class. Hostname in wrong format: {$this->url}");
         }
-        if (!$this->port) {
-            throw new ParameterValidationException("Invalid url when calling sms.at gateway class. Missing Port.");
+        if ($mode === AuthenticationMode::USER_PW && (!$usernameOrAccessToken || !$password) || $mode === AuthenticationMode::ACCESS_TOKEN && !$usernameOrAccessToken) {
+            throw new ParameterValidationException("Invalid call of sms.at gateway class. Check username/password or token.");
         }
 
         $this->mode = $mode;
@@ -122,6 +124,9 @@ class Client
     {
         // remove trailing slashes from url
         $this->url = preg_replace('/\/+$/', '', $url);
+        if (!preg_match("#^http|^https.*#i", $this->url)) {
+            $this->url = 'https://' . $this->url;
+        }
 
         $parsedUrl = parse_url($this->url);
         $this->host = $parsedUrl['host'] ?? '';
@@ -131,9 +136,9 @@ class Client
         $this->port = $parsedUrl['port'] ?? '';
 
         if (!$this->port) {
-            $this->port = 80;
-            if ($this->scheme == 'https') {
-                $this->port = 443;
+            $this->port = 443;
+            if ($this->scheme == 'http') {
+                $this->port = 80;
             }
         }
     }
@@ -178,11 +183,12 @@ class Client
      */
     private function doRequest(Message $message, int $maxSmsPerMessage, bool $test)
     {
-        $client = new \GuzzleHttp\Client([
+
+        $client = new \GuzzleHttp\Client(array_merge($this->guzzleOptions, [
             // Base URI is used with relative requests
             'base_uri' => "{$this->scheme}://{$this->host}{$this->endpointJson}",
             'timeout' => $this->connectionTimeout,
-        ]);
+        ]));
 
         $headers = [
             'User-Agent' => "PHP SDK Client with Guzzle (v" . $this->VERSION . ", PHP" . phpversion() . ")"
@@ -318,6 +324,62 @@ class Client
     function setSslVerifyHost(bool $value)
     {
         $this->sslVerifyHost = $value;
+    }
+
+    /**
+     * @param array $guzzleOptions
+     */
+    public function setGuzzleOptions(array $guzzleOptions)
+    {
+        $this->guzzleOptions = $guzzleOptions;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccessToken(): string
+    {
+        return $this->accessToken;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPort(): int
+    {
+        return $this->port;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheme(): string
+    {
+        return $this->scheme;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost(): string
+    {
+        return $this->host;
     }
 
 
