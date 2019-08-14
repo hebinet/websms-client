@@ -1,4 +1,4 @@
-<?php namespace WebSMS;
+<?php namespace WebSms;
 
 class AuthenticationMode
 {

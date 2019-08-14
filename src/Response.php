@@ -1,4 +1,4 @@
-<?php namespace WebSMS;
+<?php namespace WebSms;
 
 use Psr\Http\Message\ResponseInterface;
 use stdClass;

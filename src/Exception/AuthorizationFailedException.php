@@ -1,4 +1,4 @@
-<?php namespace WebSMS\Exception;
+<?php namespace WebSms\Exception;
 
 use Exception;
 

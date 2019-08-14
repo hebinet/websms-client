@@ -1,6 +1,6 @@
-<?php namespace WebSMS;
+<?php namespace WebSms;
 
-use WebSMS\Exception\ParameterValidationException;
+use WebSms\Exception\ParameterValidationException;
 
 abstract class Message
 {

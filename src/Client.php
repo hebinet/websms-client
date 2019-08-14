@@ -1,11 +1,11 @@
-<?php namespace WebSMS;
+<?php namespace WebSms;
 
 use GuzzleHttp\RequestOptions;
-use WebSMS\Exception\ApiException;
-use WebSMS\Exception\AuthorizationFailedException;
-use WebSMS\Exception\HttpConnectionException;
-use WebSMS\Exception\ParameterValidationException;
-use WebSMS\Exception\UnknownResponseException;
+use WebSms\Exception\ApiException;
+use WebSms\Exception\AuthorizationFailedException;
+use WebSms\Exception\HttpConnectionException;
+use WebSms\Exception\ParameterValidationException;
+use WebSms\Exception\UnknownResponseException;
 
 class Client
 {
