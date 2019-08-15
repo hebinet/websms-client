@@ -226,6 +226,10 @@ abstract class Message
      */
     public function checkRecipientAddressList(array $recipientAddressList)
     {
+        if (count($recipientAddressList) == 0) {
+            throw new ParameterValidationException("Missing recipients in message");
+        }
+        
         foreach ($recipientAddressList as $value) {
             if (!is_numeric($value)) {
                 throw new ParameterValidationException("Recipient '" . $value . "' is invalid. (must be numeric)");

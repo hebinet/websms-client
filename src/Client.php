@@ -1,5 +1,9 @@
 <?php namespace WebSms;
 
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\RequestOptions;
 use WebSms\Exception\ApiException;
 use WebSms\Exception\AuthorizationFailedException;
@@ -158,10 +162,6 @@ class Client
      */
     function send(Message $message, int $maxSmsPerMessage = null, bool $test = false)
     {
-        if (count($message->getRecipientAddressList()) < 1) {
-            throw new ParameterValidationException("Missing recipients in message");
-        }
-
         if (!is_null($maxSmsPerMessage) && $maxSmsPerMessage <= 0) {
             throw new ParameterValidationException("maxSmsPerMessage cannot be less or equal to 0, try null.");
         }
@@ -174,7 +174,7 @@ class Client
      * @param int $maxSmsPerMessage
      * @param bool $test
      *
-     * @return Response
+     * @return Response|null
      *
      * @throws ApiException
      * @throws AuthorizationFailedException
@@ -225,35 +225,43 @@ class Client
         }
 
         $path = $message instanceof BinaryMessage ? $this->endpointBinary : $this->endpointText;
-        $response = $client->post($path, $options);
+        try {
+            $response = $client->post($path, $options);
 
-        if ($response->getStatusCode() != 200) {
-            if ($response->getStatusCode() < 1) {
+            if ($response->getStatusCode() > 200 ) {
+                throw new HttpConnectionException(
+                    "Response HTTP Status: {$response->getStatusCode()}\n{$response->getBody()}",
+                    $response->getStatusCode());
+            }
+
+            if (false === strpos($response->getHeaderLine('Content-Type'), 'application/json')) {
+                throw new UnknownResponseException(
+                    "Received unknown content type '{$response->getHeaderLine('Content-Type')}'. Content: {$response->getBody()}"
+                );
+            }
+
+            $apiResult = json_decode($response->getBody()->getContents());
+            if ($apiResult->statusCode < 2000 || $apiResult->statusCode > 2001) {
+                throw new ApiException($apiResult->statusMessage, $apiResult->statusCode);
+            }
+
+            return new Response($apiResult, $response);
+        } catch (RequestException $e) {
+            if ($e instanceof ConnectException) {
                 throw new HttpConnectionException("Couldn't connect to remote server");
             }
-            if ($response->getStatusCode() == 401) {
+
+            if ($e->getCode() == 401) {
                 if ($this->mode === AuthenticationMode::ACCESS_TOKEN) {
                     throw new AuthorizationFailedException("Authentication failed. Invalid access token.");
                 }
                 throw new AuthorizationFailedException("Basic Authentication failed. Check given username and password. (Account has to be active)");
             }
+
             throw new HttpConnectionException(
-                "Response HTTP Status: {$response->getStatusCode()}\n{$response->getBody()}",
-                $response->getStatusCode());
+                "Response HTTP Status: {$e->getCode()}\n{$e->getMessage()}",
+                $e->getCode());
         }
-
-        if (strpos($response->getContentType(), 'json') === false) {
-            throw new UnknownResponseException(
-                "Received unknown content type '{$response->getContentType()}'. Content: {$response->getBody()}"
-            );
-        }
-
-        $apiResult = json_decode($response->getBody());
-        if ($apiResult->statusCode < 2000 || $apiResult->statusCode > 2001) {
-            throw new ApiException($apiResult->statusMessage, $apiResult->statusCode);
-        }
-
-        return new Response($apiResult, $response);
     }
 
     /**

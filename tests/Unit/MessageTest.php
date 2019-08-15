@@ -10,6 +10,13 @@ class MessageTest extends TestCase
     public function testValidRecipient()
     {
         try {
+            $message = new TextMessage([], 'Message');
+            $this->fail('ParameterValidationException not thrown.');
+        } catch (ParameterValidationException $e) {
+            $this->assertContains('Missing recipients', $e->getMessage());
+        }
+
+        try {
             $message = new TextMessage(['test'], 'Message');
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
