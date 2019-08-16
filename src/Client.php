@@ -80,6 +80,10 @@ class Client
      * @var array
      */
     private $guzzleOptions = [];
+    /**
+     * @var bool
+     */
+    private $testMode = false;
 
 
     /**
@@ -122,7 +126,6 @@ class Client
     /**
      * @param Message $message message object of type WebSmsCom\TextMessage or BinaryMessage
      * @param int|null $maxSmsPerMessage
-     * @param bool $test sms will not be sent when true
      *
      * @return Response
      *
@@ -132,13 +135,13 @@ class Client
      * @throws ParameterValidationException
      * @throws UnknownResponseException
      */
-    public function send(Message $message, int $maxSmsPerMessage = null, bool $test = false)
+    public function send(Message $message, int $maxSmsPerMessage = null)
     {
         if (!is_null($maxSmsPerMessage) && $maxSmsPerMessage <= 0) {
             throw new ParameterValidationException("maxSmsPerMessage cannot be less or equal to 0, try null.");
         }
 
-        return $this->doRequest($message, $maxSmsPerMessage, $test);
+        return $this->doRequest($message, $maxSmsPerMessage);
     }
 
     /**
@@ -170,7 +173,6 @@ class Client
     /**
      * @param Message $message
      * @param int $maxSmsPerMessage
-     * @param bool $test
      *
      * @return Response|null
      *
@@ -179,7 +181,7 @@ class Client
      * @throws HttpConnectionException
      * @throws UnknownResponseException
      */
-    private function doRequest(Message $message, int $maxSmsPerMessage, bool $test)
+    private function doRequest(Message $message, int $maxSmsPerMessage)
     {
 
         $client = new \GuzzleHttp\Client(array_merge($this->guzzleOptions, [
@@ -207,8 +209,9 @@ class Client
         if ($maxSmsPerMessage > 0) {
             $data['maxSmsPerMessage'] = $maxSmsPerMessage;
         }
-        if (is_bool($test)) {
-            $data['test'] = $test;
+
+        if (is_bool($this->testMode)) {
+            $data['test'] = $this->testMode;
         }
 
         $options[RequestOptions::JSON] = $data;
@@ -263,6 +266,26 @@ class Client
     }
 
     /**
+     * @return $this
+     */
+    public function test()
+    {
+        $this->testMode = true;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function noTest()
+    {
+        $this->testMode = false;
+
+        return $this;
+    }
+
+    /**
      * Returns version string of this WebSmsCom client
      *
      * @return string
@@ -303,41 +326,57 @@ class Client
     }
 
     /**
-     * Set time in seoncds for curl or fopen connection
+     * Set time in seconds for http timeout
      *
      * @param int $connectionTimeout
+     *
+     * @return Client
      */
     public function setConnectionTimeout(int $connectionTimeout)
     {
         $this->connectionTimeout = $connectionTimeout;
+
+        return $this;
     }
 
     /**
      * Set verbose to see more information about request (echoes)
      *
      * @param bool $value
+     *
+     * @return Client
      */
     public function setVerbose(bool $value)
     {
         $this->verbose = $value;
+
+        return $this;
     }
 
     /**
      * Ignore ssl host security
      *
      * @param bool $value
+     *
+     * @return Client
      */
     public function setSslVerifyHost(bool $value)
     {
         $this->sslVerifyHost = $value;
+
+        return $this;
     }
 
     /**
      * @param array $guzzleOptions
+     *
+     * @return Client
      */
     public function setGuzzleOptions(array $guzzleOptions)
     {
         $this->guzzleOptions = $guzzleOptions;
+
+        return $this;
     }
 
     /**
