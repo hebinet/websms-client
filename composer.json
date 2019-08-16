@@ -1,5 +1,5 @@
 {
-  "name": "websms-com/websmscom-php",
+  "name": "hebinet/websmscom-php",
   "description": "A lightweight PHP-client-library for using websms.com SMS services.",
   "type": "library",
   "homepage": "https://github.com/hebinet/websmscom-php",

@@ -17,7 +17,7 @@ class TextMessage extends Message
      *
      * @throws ParameterValidationException
      */
-    function __construct(array $recipientAddressList, string $messageContent)
+    public function __construct(array $recipientAddressList, string $messageContent)
     {
         $this->checkRecipientAddressList($recipientAddressList);
 

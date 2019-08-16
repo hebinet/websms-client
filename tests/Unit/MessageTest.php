@@ -24,14 +24,14 @@ class MessageTest extends TestCase
         }
 
         try {
-            $message = new \WebSMS\TextMessage(['067612345678'], 'Message');
+            $message = new \WebSms\TextMessage(['067612345678'], 'Message');
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
             $this->assertContains('max. 15 digits', $e->getMessage());
         }
 
         try {
-            $message = new \WebSMS\TextMessage(['436761234567891011'], 'Message');
+            $message = new \WebSms\TextMessage(['436761234567891011'], 'Message');
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
             $this->assertContains('max. 15 digits', $e->getMessage());

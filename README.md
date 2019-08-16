@@ -44,15 +44,15 @@ and here the content of the original send_sms.php file "translated" to the new c
 
 ```php
 <?php
-use WebSMS\AuthenticationMode;
-use WebSMS\BinaryMessage;
+use WebSms\AuthenticationMode;
+use WebSms\BinaryMessage;
 use WebSms\Client;
-use WebSMS\Exception\ApiException;
-use WebSMS\Exception\AuthorizationFailedException;
-use WebSMS\Exception\HttpConnectionException;
-use WebSMS\Exception\ParameterValidationException;
-use WebSMS\Exception\UnknownResponseException;
-use WebSMS\TextMessage;
+use WebSms\Exception\ApiException;
+use WebSms\Exception\AuthorizationFailedException;
+use WebSms\Exception\HttpConnectionException;
+use WebSms\Exception\ParameterValidationException;
+use WebSms\Exception\UnknownResponseException;
+use WebSms\TextMessage;
 
 # Modify these values to your needs
 $username = 'your_username';

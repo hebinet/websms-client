@@ -94,7 +94,7 @@ class Client
      *
      * @throws ParameterValidationException
      */
-    function __construct(
+    public function __construct(
         string $url,
         string $usernameOrAccessToken,
         string $password = null,
@@ -122,6 +122,28 @@ class Client
     }
 
     /**
+     * @param Message $message message object of type WebSmsCom\TextMessage or BinaryMessage
+     * @param int|null $maxSmsPerMessage
+     * @param bool $test sms will not be sent when true
+     *
+     * @return Response
+     *
+     * @throws ApiException
+     * @throws AuthorizationFailedException
+     * @throws HttpConnectionException
+     * @throws ParameterValidationException
+     * @throws UnknownResponseException
+     */
+    public function send(Message $message, int $maxSmsPerMessage = null, bool $test = false)
+    {
+        if (!is_null($maxSmsPerMessage) && $maxSmsPerMessage <= 0) {
+            throw new ParameterValidationException("maxSmsPerMessage cannot be less or equal to 0, try null.");
+        }
+
+        return $this->doRequest($message, $maxSmsPerMessage, $test);
+    }
+
+    /**
      * @param string $url
      */
     private function initUrl(string $url)
@@ -145,28 +167,6 @@ class Client
                 $this->port = 80;
             }
         }
-    }
-
-    /**
-     * @param Message $message message object of type WebSmsCom\TextMessage or BinaryMessage
-     * @param int|null $maxSmsPerMessage
-     * @param bool $test sms will not be sent when true
-     *
-     * @return Response
-     *
-     * @throws ApiException
-     * @throws AuthorizationFailedException
-     * @throws HttpConnectionException
-     * @throws ParameterValidationException
-     * @throws UnknownResponseException
-     */
-    function send(Message $message, int $maxSmsPerMessage = null, bool $test = false)
-    {
-        if (!is_null($maxSmsPerMessage) && $maxSmsPerMessage <= 0) {
-            throw new ParameterValidationException("maxSmsPerMessage cannot be less or equal to 0, try null.");
-        }
-
-        return $this->doRequest($message, $maxSmsPerMessage, $test);
     }
 
     /**
@@ -228,7 +228,7 @@ class Client
         try {
             $response = $client->post($path, $options);
 
-            if ($response->getStatusCode() > 200 ) {
+            if ($response->getStatusCode() > 200) {
                 throw new HttpConnectionException(
                     "Response HTTP Status: {$response->getStatusCode()}\n{$response->getBody()}",
                     $response->getStatusCode());
@@ -279,7 +279,7 @@ class Client
      *
      * @return string
      */
-    function getUsername()
+    public function getUsername()
     {
         return $this->username;
     }
@@ -289,7 +289,7 @@ class Client
      *
      * @return string
      */
-    function getUrl()
+    public function getUrl()
     {
         return $this->url;
     }
@@ -299,7 +299,7 @@ class Client
      *
      * @return int
      */
-    function getConnectionTimeout()
+    public function getConnectionTimeout()
     {
         return $this->connectionTimeout;
     }
@@ -309,7 +309,7 @@ class Client
      *
      * @param int $connectionTimeout
      */
-    function setConnectionTimeout(int $connectionTimeout)
+    public function setConnectionTimeout(int $connectionTimeout)
     {
         $this->connectionTimeout = $connectionTimeout;
     }
@@ -319,7 +319,7 @@ class Client
      *
      * @param bool $value
      */
-    function setVerbose(bool $value)
+    public function setVerbose(bool $value)
     {
         $this->verbose = $value;
     }
@@ -329,7 +329,7 @@ class Client
      *
      * @param bool $value
      */
-    function setSslVerifyHost(bool $value)
+    public function setSslVerifyHost(bool $value)
     {
         $this->sslVerifyHost = $value;
     }

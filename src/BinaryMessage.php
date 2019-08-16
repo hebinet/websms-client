@@ -23,7 +23,7 @@ class BinaryMessage extends Message
      *
      * @throws ParameterValidationException
      */
-    function __construct(array $recipientAddressList, array $messageContent, bool $userDataHeaderPresent)
+    public function __construct(array $recipientAddressList, array $messageContent, bool $userDataHeaderPresent)
     {
         $this->checkRecipientAddressList($recipientAddressList);
 

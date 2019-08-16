@@ -4,7 +4,6 @@ use Exception;
 
 class AuthorizationFailedException extends Exception
 {
-
     /**
      * AuthorizationFailedException constructor.
      *
