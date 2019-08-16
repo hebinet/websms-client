@@ -1,9 +1,9 @@
-#What is it?
+# What is it?
 A lightweight PHP-client-library for using websms.com SMS services.
 Reduces the complexity of network-communication between client and SMS gateway, 
 to help business-customer save time and money for focusing on their business logic.
 
-#Why this fork
+# Why this fork
 Rewrote complete SDK to meet the newest coding standards an utilize modern libraries.
 
 Added the following improvements:
@@ -18,11 +18,11 @@ Added the following improvements:
 
 But most of all, I did it for fun :) 
 
-#Installation
+# Installation
 
 composer require hebinet/websmscom-php
 
-#Example
+# Example
 
 ```php
 // First create the WebSms client

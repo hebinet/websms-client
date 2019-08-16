@@ -1,9 +1,7 @@
 <?php namespace WebSms;
 
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\RequestOptions;
 use WebSms\Exception\ApiException;
 use WebSms\Exception\AuthorizationFailedException;
@@ -17,7 +15,7 @@ class Client
     /**
      * @var string
      */
-    private $VERSION = "1.0.6";
+    private $VERSION = "1.0.7";
     /**
      * @var string
      */

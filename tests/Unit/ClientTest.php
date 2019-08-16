@@ -14,7 +14,6 @@ use WebSms\Exception\HttpConnectionException;
 use WebSms\Exception\ParameterValidationException;
 use WebSms\Exception\UnknownResponseException;
 use WebSms\TextMessage;
-use function GuzzleHttp\Psr7\stream_for;
 
 class ClientTest extends TestCase
 {
