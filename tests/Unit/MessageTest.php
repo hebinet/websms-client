@@ -13,28 +13,28 @@ class MessageTest extends TestCase
             $message = new TextMessage([], 'Message');
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertContains('Missing recipients', $e->getMessage());
+            $this->assertStringContainsStringIgnoringCase('Missing recipients', $e->getMessage());
         }
 
         try {
             $message = new TextMessage(['test'], 'Message');
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertContains('must be numeric', $e->getMessage());
+            $this->assertStringContainsStringIgnoringCase('must be numeric', $e->getMessage());
         }
 
         try {
             $message = new \WebSms\TextMessage(['067612345678'], 'Message');
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertContains('max. 15 digits', $e->getMessage());
+            $this->assertStringContainsStringIgnoringCase('max. 15 digits', $e->getMessage());
         }
 
         try {
             $message = new \WebSms\TextMessage(['436761234567891011'], 'Message');
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertContains('max. 15 digits', $e->getMessage());
+            $this->assertStringContainsStringIgnoringCase('max. 15 digits', $e->getMessage());
         }
     }
 }

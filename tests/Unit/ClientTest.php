@@ -23,7 +23,7 @@ class ClientTest extends TestCase
             $client = new Client('', '1234', 'wert');
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertContains('Hostname in wrong format', $e->getMessage());
+            $this->assertStringContainsStringIgnoringCase('Hostname in wrong format', $e->getMessage());
         }
 
         try {
@@ -33,7 +33,7 @@ class ClientTest extends TestCase
             $client = new Client('https://api.websms.com/', '', null, AuthenticationMode::ACCESS_TOKEN);
             $this->fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertContains('Check username/password or token', $e->getMessage());
+            $this->assertStringContainsStringIgnoringCase('Check username/password or token', $e->getMessage());
         }
     }
 
@@ -73,7 +73,7 @@ class ClientTest extends TestCase
             }
             $client->send($message, 0, true);
         } catch (ParameterValidationException $e) {
-            $this->assertContains('less or equal to 0', $e->getMessage());
+            $this->assertStringContainsStringIgnoringCase('less or equal to 0', $e->getMessage());
         }
     }
 
@@ -97,7 +97,7 @@ class ClientTest extends TestCase
                 $client->send($message, 1, true);
                 $this->fail('HttpConnectionException not thrown.');
             } catch (HttpConnectionException $e) {
-                $this->assertContains('HTTP Status: 0', $e->getMessage());
+                $this->assertStringContainsStringIgnoringCase('HTTP Status: 0', $e->getMessage());
             }
 
             try {
@@ -105,7 +105,7 @@ class ClientTest extends TestCase
                 $client->send($message, 1, true);
                 $this->fail('AuthorizationFailedException not thrown.');
             } catch (AuthorizationFailedException $e) {
-                $this->assertContains('Basic Authentication failed', $e->getMessage());
+                $this->assertStringContainsStringIgnoringCase('Basic Authentication failed', $e->getMessage());
             }
 
             try {
@@ -113,7 +113,7 @@ class ClientTest extends TestCase
                 $client->send($message, 1, true);
                 $this->fail('HttpConnectionException not thrown.');
             } catch (HttpConnectionException $e) {
-                $this->assertContains('HTTP Status: 204', $e->getMessage());
+                $this->assertStringContainsStringIgnoringCase('HTTP Status: 204', $e->getMessage());
             }
 
             try {
@@ -121,7 +121,7 @@ class ClientTest extends TestCase
                 $client->send($message, 1, true);
                 $this->fail('UnknownResponseException not thrown.');
             } catch (UnknownResponseException $e) {
-                $this->assertContains('unknown content type', $e->getMessage());
+                $this->assertStringContainsStringIgnoringCase('unknown content type', $e->getMessage());
             }
 
             try {
@@ -129,7 +129,7 @@ class ClientTest extends TestCase
                 $client->send($message, 1, true);
                 $this->fail('ApiException not thrown.');
             } catch (ApiException $e) {
-                $this->assertContains('Some error appeared', $e->getMessage());
+                $this->assertStringContainsStringIgnoringCase('Some error appeared', $e->getMessage());
             }
 
             try {
