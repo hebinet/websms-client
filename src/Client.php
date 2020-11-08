@@ -1,4 +1,6 @@
-<?php namespace WebSms;
+<?php
+
+namespace WebSms;
 
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -89,10 +91,10 @@ class Client
     /**
      * Client constructor.
      *
-     * @param string $url
-     * @param string $usernameOrAccessToken
-     * @param string|null $password
-     * @param int $mode
+     * @param  string  $url
+     * @param  string  $usernameOrAccessToken
+     * @param  string|null  $password
+     * @param  int  $mode
      *
      * @throws ParameterValidationException
      */
@@ -105,10 +107,14 @@ class Client
         $this->initUrl($url);
 
         if ((strlen($this->host) < 4)) {
-            throw new ParameterValidationException("Invalid call of sms.at gateway class. Hostname in wrong format: {$this->url}");
+            throw new ParameterValidationException(
+                "Invalid call of sms.at gateway class. Hostname in wrong format: {$this->url}"
+            );
         }
-        if ($mode === AuthenticationMode::USER_PW && (!$usernameOrAccessToken || !$password) || $mode === AuthenticationMode::ACCESS_TOKEN && !$usernameOrAccessToken) {
-            throw new ParameterValidationException("Invalid call of sms.at gateway class. Check username/password or token.");
+        if ($mode === AuthenticationMode::USER_PW && (! $usernameOrAccessToken || ! $password) || $mode === AuthenticationMode::ACCESS_TOKEN && ! $usernameOrAccessToken) {
+            throw new ParameterValidationException(
+                "Invalid call of sms.at gateway class. Check username/password or token."
+            );
         }
 
         $this->mode = $mode;
@@ -120,12 +126,11 @@ class Client
         } else { // access token authentication
             $this->accessToken = $usernameOrAccessToken;
         }
-
     }
 
     /**
-     * @param Message $message message object of type WebSmsCom\TextMessage or BinaryMessage
-     * @param int|null $maxSmsPerMessage
+     * @param  Message  $message  message object of type WebSmsCom\TextMessage or BinaryMessage
+     * @param  int|null  $maxSmsPerMessage
      *
      * @return Response
      *
@@ -137,7 +142,7 @@ class Client
      */
     public function send(Message $message, int $maxSmsPerMessage = null)
     {
-        if (!is_null($maxSmsPerMessage) && $maxSmsPerMessage <= 0) {
+        if (! is_null($maxSmsPerMessage) && $maxSmsPerMessage <= 0) {
             throw new ParameterValidationException("maxSmsPerMessage cannot be less or equal to 0, try null.");
         }
 
@@ -145,14 +150,14 @@ class Client
     }
 
     /**
-     * @param string $url
+     * @param  string  $url
      */
     private function initUrl(string $url)
     {
         // remove trailing slashes from url
         $this->url = preg_replace('/\/+$/', '', $url);
-        if (!preg_match("#^http|^https.*#i", $this->url)) {
-            $this->url = 'https://' . $this->url;
+        if (! preg_match("#^http|^https.*#i", $this->url)) {
+            $this->url = 'https://'.$this->url;
         }
 
         $parsedUrl = parse_url($this->url);
@@ -162,17 +167,17 @@ class Client
         $this->scheme = $parsedUrl['scheme'] ?? 'http';
         $this->port = $parsedUrl['port'] ?? '';
 
-        if (!$this->port) {
+        if (! $this->port) {
             $this->port = 443;
-            if ($this->scheme == 'http') {
+            if ($this->scheme === 'http') {
                 $this->port = 80;
             }
         }
     }
 
     /**
-     * @param Message $message
-     * @param int $maxSmsPerMessage
+     * @param  Message  $message
+     * @param  int  $maxSmsPerMessage
      *
      * @return Response|null
      *
@@ -181,24 +186,28 @@ class Client
      * @throws HttpConnectionException
      * @throws UnknownResponseException
      */
-    private function doRequest(Message $message, int $maxSmsPerMessage)
+    private function doRequest(Message $message, int $maxSmsPerMessage): ?Response
     {
-
-        $client = new \GuzzleHttp\Client(array_merge($this->guzzleOptions, [
-            // Base URI is used with relative requests
-            'base_uri' => "{$this->scheme}://{$this->host}{$this->endpointJson}",
-            'timeout' => $this->connectionTimeout,
-        ]));
+        $client = new \GuzzleHttp\Client(
+            array_merge(
+                $this->guzzleOptions,
+                [
+                    // Base URI is used with relative requests
+                    'base_uri' => "{$this->scheme}://{$this->host}{$this->endpointJson}",
+                    'timeout' => $this->connectionTimeout,
+                ]
+            )
+        );
 
         $headers = [
-            'User-Agent' => "PHP SDK Client with Guzzle (v" . $this->VERSION . ", PHP" . phpversion() . ")"
+            'User-Agent' => "PHP SDK Client with Guzzle (v".$this->VERSION.", PHP".phpversion().")",
         ];
         $options = [];
 
         if ($this->mode === AuthenticationMode::USER_PW) {
             $options['auth'] = [
                 $this->username,
-                $this->password
+                $this->password,
             ];
         } else {
             // add access token in header
@@ -216,7 +225,7 @@ class Client
 
         $options[RequestOptions::JSON] = $data;
         $options[RequestOptions::HEADERS] = $headers;
-        if (!$this->sslVerifyHost) {
+        if (! $this->sslVerifyHost) {
             // Defaults to true so we need only check for false.
             // Guzzle Docs: Disable validation entirely (don't do this!).
             $options[RequestOptions::VERIFY] = false;
@@ -232,7 +241,8 @@ class Client
             if ($response->getStatusCode() > 200) {
                 throw new HttpConnectionException(
                     "Response HTTP Status: {$response->getStatusCode()}\n{$response->getBody()}",
-                    $response->getStatusCode());
+                    $response->getStatusCode()
+                );
             }
 
             if (false === strpos($response->getHeaderLine('Content-Type'), 'application/json')) {
@@ -252,23 +262,26 @@ class Client
                 throw new HttpConnectionException("Couldn't connect to remote server");
             }
 
-            if ($e->getCode() == 401) {
+            if ($e->getCode() === 401) {
                 if ($this->mode === AuthenticationMode::ACCESS_TOKEN) {
                     throw new AuthorizationFailedException("Authentication failed. Invalid access token.");
                 }
-                throw new AuthorizationFailedException("Basic Authentication failed. Check given username and password. (Account has to be active)");
+                throw new AuthorizationFailedException(
+                    "Basic Authentication failed. Check given username and password. (Account has to be active)"
+                );
             }
 
             throw new HttpConnectionException(
                 "Response HTTP Status: {$e->getCode()}\n{$e->getMessage()}",
-                $e->getCode());
+                $e->getCode()
+            );
         }
     }
 
     /**
      * @return $this
      */
-    public function test()
+    public function test(): self
     {
         $this->testMode = true;
 
@@ -278,7 +291,7 @@ class Client
     /**
      * @return $this
      */
-    public function noTest()
+    public function noTest(): self
     {
         $this->testMode = false;
 
@@ -290,7 +303,7 @@ class Client
      *
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->VERSION;
     }
@@ -300,7 +313,7 @@ class Client
      *
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -310,7 +323,7 @@ class Client
      *
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -320,7 +333,7 @@ class Client
      *
      * @return int
      */
-    public function getConnectionTimeout()
+    public function getConnectionTimeout(): int
     {
         return $this->connectionTimeout;
     }
@@ -328,11 +341,11 @@ class Client
     /**
      * Set time in seconds for http timeout
      *
-     * @param int $connectionTimeout
+     * @param  int  $connectionTimeout
      *
      * @return Client
      */
-    public function setConnectionTimeout(int $connectionTimeout)
+    public function setConnectionTimeout(int $connectionTimeout): Client
     {
         $this->connectionTimeout = $connectionTimeout;
 
@@ -342,11 +355,11 @@ class Client
     /**
      * Set verbose to see more information about request (echoes)
      *
-     * @param bool $value
+     * @param  bool  $value
      *
      * @return Client
      */
-    public function setVerbose(bool $value)
+    public function setVerbose(bool $value): Client
     {
         $this->verbose = $value;
 
@@ -356,11 +369,11 @@ class Client
     /**
      * Ignore ssl host security
      *
-     * @param bool $value
+     * @param  bool  $value
      *
      * @return Client
      */
-    public function setSslVerifyHost(bool $value)
+    public function setSslVerifyHost(bool $value): Client
     {
         $this->sslVerifyHost = $value;
 
@@ -368,11 +381,11 @@ class Client
     }
 
     /**
-     * @param array $guzzleOptions
+     * @param  array  $guzzleOptions
      *
      * @return Client
      */
-    public function setGuzzleOptions(array $guzzleOptions)
+    public function setGuzzleOptions(array $guzzleOptions): Client
     {
         $this->guzzleOptions = $guzzleOptions;
 
@@ -426,6 +439,4 @@ class Client
     {
         return $this->host;
     }
-
-
 }

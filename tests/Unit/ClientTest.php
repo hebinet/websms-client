@@ -1,4 +1,6 @@
-<?php namespace WebSms\Tests\Unit;
+<?php
+
+namespace WebSms\Tests\Unit;
 
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
@@ -17,50 +19,52 @@ use WebSms\TextMessage;
 
 class ClientTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         try {
-            $client = new Client('', '1234', 'wert');
-            $this->fail('ParameterValidationException not thrown.');
+            new Client('', '1234', 'wert');
+
+            self::fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertStringContainsStringIgnoringCase('Hostname in wrong format', $e->getMessage());
+            self::assertStringContainsStringIgnoringCase('Hostname in wrong format', $e->getMessage());
         }
 
         try {
-            $client = new Client('https://api.websms.com/', '', '');
-            $client = new Client('https://api.websms.com/', 'test', '');
-            $client = new Client('https://api.websms.com/', '', 'wert');
-            $client = new Client('https://api.websms.com/', '', null, AuthenticationMode::ACCESS_TOKEN);
-            $this->fail('ParameterValidationException not thrown.');
+            new Client('https://api.websms.com/', '', '');
+            new Client('https://api.websms.com/', 'test', '');
+            new Client('https://api.websms.com/', '', 'wert');
+            new Client('https://api.websms.com/', '', null, AuthenticationMode::ACCESS_TOKEN);
+
+            self::fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertStringContainsStringIgnoringCase('Check username/password or token', $e->getMessage());
+            self::assertStringContainsStringIgnoringCase('Check username/password or token', $e->getMessage());
         }
     }
 
-    public function testUrlInit()
+    public function testUrlInit(): void
     {
         $client = new Client('https://api.websms.com/', 'test', '123456');
 
-        $this->assertEquals('https', $client->getScheme());
-        $this->assertEquals('api.websms.com', $client->getHost());
-        $this->assertEquals('', $client->getPath());
-        $this->assertEquals('443', $client->getPort());
+        self::assertEquals('https', $client->getScheme());
+        self::assertEquals('api.websms.com', $client->getHost());
+        self::assertEquals('', $client->getPath());
+        self::assertEquals('443', $client->getPort());
 
 
         $client = new Client('http://api.websms.com/', 'test', '123456');
 
-        $this->assertEquals('http', $client->getScheme());
-        $this->assertEquals('80', $client->getPort());
+        self::assertEquals('http', $client->getScheme());
+        self::assertEquals('80', $client->getPort());
 
 
         $client = new Client('api.websms.com/', 'test', '123456');
 
         // defaults to https
-        $this->assertEquals('https', $client->getScheme());
-        $this->assertEquals('443', $client->getPort());
+        self::assertEquals('https', $client->getScheme());
+        self::assertEquals('443', $client->getPort());
     }
 
-    public function testMaxSmsPerMessage()
+    public function testMaxSmsPerMessage(): void
     {
         $client = new Client('https://api.websms.com/', 'test', '123456');
 
@@ -69,96 +73,97 @@ class ClientTest extends TestCase
             try {
                 $message = new TextMessage(['4367612345678'], 'Message');
             } catch (ParameterValidationException $e) {
-                $this->fail('ParameterValidationException thrown.');
+                self::fail('ParameterValidationException thrown.');
             }
-            $client->send($message, 0, true);
+            $client->send($message, 0);
         } catch (ParameterValidationException $e) {
-            $this->assertStringContainsStringIgnoringCase('less or equal to 0', $e->getMessage());
+            self::assertStringContainsStringIgnoringCase('less or equal to 0', $e->getMessage());
         }
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new Client('https://api.websms.com/', 'test', '123456');
-        $client->setGuzzleOptions([
-            'handler' => $this->getMockHandlers()
-        ]);
+        $client->setGuzzleOptions(
+            [
+                'handler' => $this->getMockHandlers(),
+            ]
+        );
 
         try {
             $message = null;
             try {
                 $message = new TextMessage(['4367612345678'], 'Message');
             } catch (ParameterValidationException $e) {
-                $this->fail('ParameterValidationException thrown.');
+                self::fail('ParameterValidationException thrown.');
             }
 
             try {
                 // couldn't connect
-                $client->send($message, 1, true);
-                $this->fail('HttpConnectionException not thrown.');
+                $client->send($message, 1);
+                self::fail('HttpConnectionException not thrown.');
             } catch (HttpConnectionException $e) {
-                $this->assertStringContainsStringIgnoringCase('HTTP Status: 0', $e->getMessage());
+                self::assertStringContainsStringIgnoringCase('HTTP Status: 0', $e->getMessage());
             }
 
             try {
                 // Authentication failed Username/Password
-                $client->send($message, 1, true);
-                $this->fail('AuthorizationFailedException not thrown.');
+                $client->send($message, 1);
+                self::fail('AuthorizationFailedException not thrown.');
             } catch (AuthorizationFailedException $e) {
-                $this->assertStringContainsStringIgnoringCase('Basic Authentication failed', $e->getMessage());
+                self::assertStringContainsStringIgnoringCase('Basic Authentication failed', $e->getMessage());
             }
 
             try {
                 // HTTP Error
-                $client->send($message, 1, true);
-                $this->fail('HttpConnectionException not thrown.');
+                $client->send($message, 1);
+                self::fail('HttpConnectionException not thrown.');
             } catch (HttpConnectionException $e) {
-                $this->assertStringContainsStringIgnoringCase('HTTP Status: 204', $e->getMessage());
+                self::assertStringContainsStringIgnoringCase('HTTP Status: 204', $e->getMessage());
             }
 
             try {
                 // No JSON Response
-                $client->send($message, 1, true);
-                $this->fail('UnknownResponseException not thrown.');
+                $client->send($message, 1);
+                self::fail('UnknownResponseException not thrown.');
             } catch (UnknownResponseException $e) {
-                $this->assertStringContainsStringIgnoringCase('unknown content type', $e->getMessage());
+                self::assertStringContainsStringIgnoringCase('unknown content type', $e->getMessage());
             }
 
             try {
                 // Wrong API status code
-                $client->send($message, 1, true);
-                $this->fail('ApiException not thrown.');
+                $client->send($message, 1);
+                self::fail('ApiException not thrown.');
             } catch (ApiException $e) {
-                $this->assertStringContainsStringIgnoringCase('Some error appeared', $e->getMessage());
+                self::assertStringContainsStringIgnoringCase('Some error appeared', $e->getMessage());
             }
 
             try {
                 // Success
-                $response = $client->send($message, 1, true);
+                $response = $client->send($message, 1);
 
-                $this->assertEquals(2000, $response->getApiStatusCode());
-                $this->assertEquals('OK', $response->getApiStatusMessage());
-                $this->assertEquals('12345', $response->getTransferId());
-                $this->assertEquals('67890', $response->getClientMessageId());
-
+                self::assertEquals(2000, $response->getApiStatusCode());
+                self::assertEquals('OK', $response->getApiStatusMessage());
+                self::assertEquals('12345', $response->getTransferId());
+                self::assertEquals('67890', $response->getClientMessageId());
             } catch (ApiException $e) {
-                $this->fail('ApiException thrown.');
+                self::fail('ApiException thrown.');
             } catch (AuthorizationFailedException $e) {
-                $this->fail('AuthorizationFailedException thrown.');
+                self::fail('AuthorizationFailedException thrown.');
             } catch (HttpConnectionException $e) {
-                $this->fail('HttpConnectionException thrown.');
+                self::fail('HttpConnectionException thrown.');
             } catch (UnknownResponseException $e) {
-                $this->fail('UnknownResponseException thrown.');
+                self::fail('UnknownResponseException thrown.');
             }
         } catch (ParameterValidationException $e) {
-            $this->fail('ParameterValidationException thrown.');
+            self::fail('ParameterValidationException thrown.');
         }
     }
 
     /**
      * @return HandlerStack
      */
-    private function getMockHandlers()
+    private function getMockHandlers(): HandlerStack
     {
         $wrongApiStatusCode = new \stdClass();
         $wrongApiStatusCode->statusCode = 1999;
@@ -170,23 +175,25 @@ class ClientTest extends TestCase
         $successfulResponse->transferId = '12345';
         $successfulResponse->clientMessageId = '67890';
 
-        $mock = new MockHandler([
-            // couldn't connect
-            new RequestException("Error Communicating with Server", new Request('GET', 'test')),
-            // Authentication failed
-            new Response(401, []),
-            //new Response(401, []),
-            // HTTP Error
-            new Response(204, ['Content-Type' => 'application/json']),
-            // No JSON Response
-            new Response(200, ['Content-Type' => 'text/plain'], 'test'),
-            // Wrong API status code
-            new Response(200, ['Content-Type' => 'application/json'], json_encode($wrongApiStatusCode)),
+        $mock = new MockHandler(
+            [
+                // couldn't connect
+                new RequestException("Error Communicating with Server", new Request('GET', 'test')),
+                // Authentication failed
+                new Response(401, []),
+                //new Response(401, []),
+                // HTTP Error
+                new Response(204, ['Content-Type' => 'application/json']),
+                // No JSON Response
+                new Response(200, ['Content-Type' => 'text/plain'], 'test'),
+                // Wrong API status code
+                new Response(200, ['Content-Type' => 'application/json'], json_encode($wrongApiStatusCode)),
 
-            // Success
-            new Response(200, ['Content-Type' => 'application/json'], json_encode($successfulResponse))
+                // Success
+                new Response(200, ['Content-Type' => 'application/json'], json_encode($successfulResponse)),
 
-        ]);
+            ]
+        );
 
         return HandlerStack::create($mock);
     }

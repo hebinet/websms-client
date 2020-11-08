@@ -1,4 +1,6 @@
-<?php namespace WebSms\Tests\Unit;
+<?php
+
+namespace WebSms\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use WebSms\Exception\ParameterValidationException;
@@ -6,35 +8,34 @@ use WebSms\TextMessage;
 
 class MessageTest extends TestCase
 {
-
-    public function testValidRecipient()
+    public function testValidRecipient(): void
     {
         try {
-            $message = new TextMessage([], 'Message');
-            $this->fail('ParameterValidationException not thrown.');
+            new TextMessage([], 'Message');
+            self::fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertStringContainsStringIgnoringCase('Missing recipients', $e->getMessage());
+            self::assertStringContainsStringIgnoringCase('Missing recipients', $e->getMessage());
         }
 
         try {
-            $message = new TextMessage(['test'], 'Message');
-            $this->fail('ParameterValidationException not thrown.');
+            new TextMessage(['test'], 'Message');
+            self::fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertStringContainsStringIgnoringCase('must be numeric', $e->getMessage());
+            self::assertStringContainsStringIgnoringCase('must be numeric', $e->getMessage());
         }
 
         try {
-            $message = new \WebSms\TextMessage(['067612345678'], 'Message');
-            $this->fail('ParameterValidationException not thrown.');
+            new TextMessage(['067612345678'], 'Message');
+            self::fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertStringContainsStringIgnoringCase('max. 15 digits', $e->getMessage());
+            self::assertStringContainsStringIgnoringCase('max. 15 digits', $e->getMessage());
         }
 
         try {
-            $message = new \WebSms\TextMessage(['436761234567891011'], 'Message');
-            $this->fail('ParameterValidationException not thrown.');
+            new TextMessage(['436761234567891011'], 'Message');
+            self::fail('ParameterValidationException not thrown.');
         } catch (ParameterValidationException $e) {
-            $this->assertStringContainsStringIgnoringCase('max. 15 digits', $e->getMessage());
+            self::assertStringContainsStringIgnoringCase('max. 15 digits', $e->getMessage());
         }
     }
 }
