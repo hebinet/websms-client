@@ -4,10 +4,10 @@ Reduces the complexity of network-communication between client and SMS gateway,
 to help business-customer save time and money for focusing on their business logic.
 
 # Why this fork
-Rewrote complete SDK to meet the newest coding standards an utilize modern libraries.
+Rewrote complete SDK to meet the newest coding standards and utilize modern libraries.
 
 Added the following improvements:
-* Raised minimum required PHP version to 7.1
+* Raised minimum required PHP version to 8.0+ (For PHP <8.0 use v1.0.7.7)
 * Use Namespaces
 * Switched from kebab-case to CamelCase for properties and methods
 * Used famous and well tested GuzzleHttp library instead of plain Curl or fsockopen
