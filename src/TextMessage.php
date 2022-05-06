@@ -28,4 +28,14 @@ class TextMessage extends Message
 
         return $this;
     }
+
+    public function getMessageCount(): int
+    {
+        $length = strlen(trim($this->getMessageContent()));
+        if ($length > 160) {
+            return (int) ($length / 153) + 1;
+        }
+
+        return 1;
+    }
 }

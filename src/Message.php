@@ -117,7 +117,7 @@ abstract class Message
      * Set message id for this message, returned with response
      * and used for notifications.
      */
-    public function setClientMessageId(string $clientMessageId): static
+    public function clientMessageId(string $clientMessageId): static
     {
         $this->clientMessageId = $clientMessageId;
 

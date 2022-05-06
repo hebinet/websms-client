@@ -9,6 +9,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
+         beStrictAboutOutputDuringTests="true"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
     <testsuites>
         <testsuite name="WebSms Test Suite">
