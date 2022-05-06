@@ -1,4 +1,5 @@
 <?php
+
 namespace WebSms;
 
 use Psr\Http\Message\ResponseInterface;
@@ -18,7 +19,7 @@ class Response
 
     public function getRawContent(): string
     {
-        return (string)$this->httpResponse->getBody();
+        return (string) $this->httpResponse->getBody();
     }
 
     public function getApiStatusCode(): int

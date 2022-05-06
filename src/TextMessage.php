@@ -1,4 +1,5 @@
 <?php
+
 namespace WebSms;
 
 class TextMessage extends Message
@@ -19,7 +20,7 @@ class TextMessage extends Message
     }
 
     /**
-     * Set utf8 string message text
+     * Set utf8 string message text.
      */
     public function messageContent(string $messageContent): static
     {

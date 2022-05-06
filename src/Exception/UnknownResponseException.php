@@ -1,4 +1,5 @@
 <?php
+
 namespace WebSms\Exception;
 
 use Exception;

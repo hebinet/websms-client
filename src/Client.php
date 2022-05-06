@@ -13,7 +13,7 @@ use WebSms\Exception\UnknownResponseException;
 
 class Client
 {
-    protected string $VERSION = "1.0.8";
+    protected string $VERSION = '1.0.8';
 
     protected string $username;
 
@@ -37,11 +37,11 @@ class Client
 
     protected int $connectionTimeout = 10;
 
-    protected string $endpointJson = "/json/smsmessaging/";
+    protected string $endpointJson = '/json/smsmessaging/';
 
-    protected string $endpointText = "text";
+    protected string $endpointText = 'text';
 
-    protected string $endpointBinary = "binary";
+    protected string $endpointBinary = 'binary';
 
     protected bool $sslVerifyHost = true;
 
@@ -65,7 +65,7 @@ class Client
 
         if ($this->checkAuth($mode, $usernameOrAccessToken, $password)) {
             throw new ParameterValidationException(
-                "Invalid call of sms.at gateway class. Check username/password or token."
+                'Invalid call of sms.at gateway class. Check username/password or token.'
             );
         }
 
@@ -83,7 +83,7 @@ class Client
     public function send(Message $message, ?int $maxSmsPerMessage = null): ?Response
     {
         if ($maxSmsPerMessage !== null && $maxSmsPerMessage <= 0) {
-            throw new ParameterValidationException("maxSmsPerMessage cannot be less or equal to 0, try null.");
+            throw new ParameterValidationException('maxSmsPerMessage cannot be less or equal to 0, try null.');
         }
 
         return $this->doRequest($message, $maxSmsPerMessage);
@@ -93,7 +93,7 @@ class Client
     {
         // remove trailing slashes from url
         $this->url = rtrim($url, '/');
-        if ( ! str_starts_with($this->url, 'http')) {
+        if (! str_starts_with($this->url, 'http')) {
             $this->url = 'https://'.$this->url;
         }
 
@@ -123,7 +123,7 @@ class Client
         );
 
         $headers = [
-            'User-Agent' => "PHP SDK Client with Guzzle (v".$this->VERSION.", PHP".phpversion().")",
+            'User-Agent' => 'PHP SDK Client with Guzzle (v'.$this->VERSION.', PHP'.phpversion().')',
         ];
         $options = [];
 
@@ -146,7 +146,7 @@ class Client
 
         $options[RequestOptions::JSON] = $data;
         $options[RequestOptions::HEADERS] = $headers;
-        if ( ! $this->sslVerifyHost) {
+        if (! $this->sslVerifyHost) {
             // Defaults to true so we need to only check for false.
             // Guzzle Docs: Disable validation entirely (don't do this!).
             $options[RequestOptions::VERIFY] = false;
@@ -166,7 +166,7 @@ class Client
                 );
             }
 
-            if ( ! str_contains($response->getHeaderLine('Content-Type'), 'application/json')) {
+            if (! str_contains($response->getHeaderLine('Content-Type'), 'application/json')) {
                 throw new UnknownResponseException(
                     "Received unknown content type '{$response->getHeaderLine('Content-Type')}'. Content: {$response->getBody()}"
                 );
@@ -185,10 +185,10 @@ class Client
 
             if ($e->getCode() === 401) {
                 if ($this->mode === AuthenticationMode::ACCESS_TOKEN) {
-                    throw new AuthorizationFailedException("Authentication failed. Invalid access token.");
+                    throw new AuthorizationFailedException('Authentication failed. Invalid access token.');
                 }
                 throw new AuthorizationFailedException(
-                    "Basic Authentication failed. Check given username and password. (Account has to be active)"
+                    'Basic Authentication failed. Check given username and password. (Account has to be active)'
                 );
             }
 
@@ -286,7 +286,7 @@ class Client
 
     protected function checkAuth(int $mode, string $usernameOrAccessToken, ?string $password): bool
     {
-        if ($mode === AuthenticationMode::USER_PW && ( ! $usernameOrAccessToken || ! $password)) {
+        if ($mode === AuthenticationMode::USER_PW && (! $usernameOrAccessToken || ! $password)) {
             return false;
         }
 

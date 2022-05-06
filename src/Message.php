@@ -46,7 +46,7 @@ abstract class Message
 
     /**
      * set string of sender address msisdn or alphanumeric
-     * sender address is dependend on user account
+     * sender address is dependend on user account.
      */
     public function senderAddress(string $senderAddress): static
     {
@@ -62,11 +62,11 @@ abstract class Message
 
     /**
      * Depending on account settings this can be set to
-     * 'national', 'international', 'alphanumeric' or 'shortcode'
+     * 'national', 'international', 'alphanumeric' or 'shortcode'.
      */
     public function senderAddressType(string $senderAddressType): static
     {
-        if ( ! in_array($senderAddressType, self::$availableSenderAddressType, true)) {
+        if (! in_array($senderAddressType, self::$availableSenderAddressType, true)) {
             throw new ParameterValidationException("Given senderAddressType '$senderAddressType' is invalid");
         }
 
@@ -82,7 +82,7 @@ abstract class Message
 
     /**
      * Set send as flash sms flag true or false
-     * (SMS is not saved on SIM, but shown directly on screen)
+     * (SMS is not saved on SIM, but shown directly on screen).
      */
     public function sendAsFlashSms(bool $sendAsFlashSms): static
     {
@@ -99,7 +99,7 @@ abstract class Message
     /**
      * Set string og notification callback url
      * customers url that listens for delivery report notifications
-     * or replies for this message
+     * or replies for this message.
      */
     public function notificationCallbackUrl(string $notificationCallbackUrl): static
     {
@@ -115,7 +115,7 @@ abstract class Message
 
     /**
      * Set message id for this message, returned with response
-     * and used for notifications
+     * and used for notifications.
      */
     public function setClientMessageId(string $clientMessageId): static
     {
@@ -131,7 +131,7 @@ abstract class Message
 
     /**
      * Sets message priority as integer (1 to 9)
-     * (if supported by account settings)
+     * (if supported by account settings).
      */
     public function priority(int $priority): static
     {
@@ -159,11 +159,11 @@ abstract class Message
     public function checkRecipientAddressList(array $recipientAddressList): void
     {
         if (empty($recipientAddressList)) {
-            throw new ParameterValidationException("Missing recipients in message");
+            throw new ParameterValidationException('Missing recipients in message');
         }
 
         foreach ($recipientAddressList as $value) {
-            if ( ! is_numeric($value)) {
+            if (! is_numeric($value)) {
                 throw new ParameterValidationException("Recipient '".$value."' is invalid. (must be numeric)");
             }
             if (is_string($value) && (str_starts_with($value, '0') || ! preg_match('/^\d{1,15}$/', $value))) {
@@ -171,5 +171,4 @@ abstract class Message
             }
         }
     }
-
 }

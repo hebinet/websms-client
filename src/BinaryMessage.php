@@ -1,7 +1,6 @@
 <?php
-namespace WebSms;
 
-use WebSms\Exception\ParameterValidationException;
+namespace WebSms;
 
 class BinaryMessage extends Message
 {
@@ -24,7 +23,7 @@ class BinaryMessage extends Message
     }
 
     /**
-     * Set binary message content (array of base64 encoded binary strings)
+     * Set binary message content (array of base64 encoded binary strings).
      */
     public function messageContent(array $messageContent): static
     {
@@ -41,7 +40,7 @@ class BinaryMessage extends Message
     /**
      * Set boolean userDataHeaderPresent flag
      * When set to true, messageContent segments are expected
-     * to contain a UserDataHeader
+     * to contain a UserDataHeader.
      */
     public function userDataHeaderPresent(bool $userDataHeaderPresent): static
     {
