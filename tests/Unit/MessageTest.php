@@ -1,41 +1,17 @@
 <?php
 
-namespace WebSms\Tests\Unit;
-
 use PHPUnit\Framework\TestCase;
 use WebSms\Exception\ParameterValidationException;
 use WebSms\TextMessage;
 
-class MessageTest extends TestCase
-{
-    public function testValidRecipient(): void
-    {
-        try {
-            new TextMessage([], 'Message');
-            self::fail('ParameterValidationException not thrown.');
-        } catch (ParameterValidationException $e) {
-            self::assertStringContainsStringIgnoringCase('Missing recipients', $e->getMessage());
-        }
+it('can validate the recipient list', function (array $recipients, string $exceptionMessage) {
+    $this->expectException(ParameterValidationException::class);
+    $this->expectExceptionMessageMatches("/.*?{$exceptionMessage}.*?/i");
 
-        try {
-            new TextMessage(['test'], 'Message');
-            self::fail('ParameterValidationException not thrown.');
-        } catch (ParameterValidationException $e) {
-            self::assertStringContainsStringIgnoringCase('must be numeric', $e->getMessage());
-        }
-
-        try {
-            new TextMessage(['067612345678'], 'Message');
-            self::fail('ParameterValidationException not thrown.');
-        } catch (ParameterValidationException $e) {
-            self::assertStringContainsStringIgnoringCase('max. 15 digits', $e->getMessage());
-        }
-
-        try {
-            new TextMessage(['436761234567891011'], 'Message');
-            self::fail('ParameterValidationException not thrown.');
-        } catch (ParameterValidationException $e) {
-            self::assertStringContainsStringIgnoringCase('max. 15 digits', $e->getMessage());
-        }
-    }
-}
+    new TextMessage($recipients, 'Message');
+})->with([
+    'empty recipients' => [[], 'Missing recipients'],
+    'text recipients' => [['test'], 'must be numeric'],
+    'max 15 numbers with leading 0' => [['067612345678'], 'max. 15 digits'],
+    'max 15 numbers with leading country code' => [['436761234567891011'], 'max. 15 digits'],
+]);

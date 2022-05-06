@@ -83,7 +83,7 @@ class Client
     public function send(Message $message, ?int $maxSmsPerMessage = null): ?Response
     {
         if ($maxSmsPerMessage !== null && $maxSmsPerMessage <= 0) {
-            throw new ParameterValidationException('maxSmsPerMessage cannot be less or equal to 0, try null.');
+            throw new ParameterValidationException('maxSmsPerMessage cannot be less or equal to 0, try null instead.');
         }
 
         return $this->doRequest($message, $maxSmsPerMessage);
@@ -286,10 +286,10 @@ class Client
 
     protected function checkAuth(int $mode, string $usernameOrAccessToken, ?string $password): bool
     {
-        if ($mode === AuthenticationMode::USER_PW && (! $usernameOrAccessToken || ! $password)) {
-            return false;
+        if ($mode === AuthenticationMode::USER_PW && (empty($usernameOrAccessToken) || empty($password))) {
+            return true;
         }
 
-        return $mode === AuthenticationMode::ACCESS_TOKEN && ! $usernameOrAccessToken;
+        return $mode === AuthenticationMode::ACCESS_TOKEN && empty($usernameOrAccessToken);
     }
 }
