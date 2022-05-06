@@ -226,28 +226,28 @@ class Client
         return $this->connectionTimeout;
     }
 
-    public function setConnectionTimeout(int $connectionTimeout): Client
+    public function connectionTimeout(int $connectionTimeout): Client
     {
         $this->connectionTimeout = $connectionTimeout;
 
         return $this;
     }
 
-    public function setVerbose(bool $value): Client
+    public function verbose(bool $value): Client
     {
         $this->verbose = $value;
 
         return $this;
     }
 
-    public function setSslVerifyHost(bool $value): Client
+    public function sslVerifyHost(bool $value): Client
     {
         $this->sslVerifyHost = $value;
 
         return $this;
     }
 
-    public function setGuzzleOptions(array $guzzleOptions): Client
+    public function guzzleOptions(array $guzzleOptions): Client
     {
         $this->guzzleOptions = $guzzleOptions;
 
