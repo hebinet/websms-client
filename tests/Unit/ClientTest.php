@@ -48,20 +48,20 @@ class ClientTest extends TestCase
         self::assertEquals('https', $client->getScheme());
         self::assertEquals('api.websms.com', $client->getHost());
         self::assertEquals('', $client->getPath());
-        self::assertEquals('443', $client->getPort());
+        self::assertEquals(443, $client->getPort());
 
 
         $client = new Client('http://api.websms.com/', 'test', '123456');
 
         self::assertEquals('http', $client->getScheme());
-        self::assertEquals('80', $client->getPort());
+        self::assertEquals(80, $client->getPort());
 
 
         $client = new Client('api.websms.com/', 'test', '123456');
 
         // defaults to https
         self::assertEquals('https', $client->getScheme());
-        self::assertEquals('443', $client->getPort());
+        self::assertEquals(443, $client->getPort());
     }
 
     public function testMaxSmsPerMessage(): void
@@ -160,10 +160,7 @@ class ClientTest extends TestCase
         }
     }
 
-    /**
-     * @return HandlerStack
-     */
-    private function getMockHandlers(): HandlerStack
+    protected function getMockHandlers(): HandlerStack
     {
         $wrongApiStatusCode = new \stdClass();
         $wrongApiStatusCode->statusCode = 1999;
@@ -187,10 +184,12 @@ class ClientTest extends TestCase
                 // No JSON Response
                 new Response(200, ['Content-Type' => 'text/plain'], 'test'),
                 // Wrong API status code
-                new Response(200, ['Content-Type' => 'application/json'], json_encode($wrongApiStatusCode)),
+                new Response(200, ['Content-Type' => 'application/json'],
+                    json_encode($wrongApiStatusCode, JSON_THROW_ON_ERROR)),
 
                 // Success
-                new Response(200, ['Content-Type' => 'application/json'], json_encode($successfulResponse)),
+                new Response(200, ['Content-Type' => 'application/json'],
+                    json_encode($successfulResponse, JSON_THROW_ON_ERROR)),
 
             ]
         );

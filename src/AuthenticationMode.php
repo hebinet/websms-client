@@ -1,7 +1,9 @@
-<?php namespace WebSms;
+<?php
+
+namespace WebSms;
 
 class AuthenticationMode
 {
-    const USER_PW = 0;
-    const ACCESS_TOKEN = 1;
+    public const USER_PW = 0;
+    public const ACCESS_TOKEN = 1;
 }

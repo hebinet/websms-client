@@ -13,95 +13,46 @@ use WebSms\Exception\UnknownResponseException;
 
 class Client
 {
+    protected string $VERSION = "1.0.8";
 
-    /**
-     * @var string
-     */
-    private $VERSION = "1.0.7";
-    /**
-     * @var string
-     */
-    private $username;
-    /**
-     * @var string
-     */
-    private $accessToken;
-    /**
-     * @var int
-     */
-    private $mode;
-    /**
-     * @var string|null
-     */
-    private $password;
-    /**
-     * @var string
-     */
-    private $url;
-    /**
-     * @var string
-     */
-    private $path;
-    /**
-     * @var int
-     */
-    private $port;
-    /**
-     * @var string
-     */
-    private $scheme;
-    /**
-     * @var string
-     */
-    private $host;
-    /**
-     * @var bool
-     */
-    private $verbose = false;
-    /**
-     * @var int
-     */
-    private $connectionTimeout = 10;
-    /**
-     * @var string
-     */
-    private $endpointJson = "/json/smsmessaging/";
-    /**
-     * @var string
-     */
-    private $endpointText = "text";
-    /**
-     * @var string
-     */
-    private $endpointBinary = "binary";
-    /**
-     * @var bool
-     */
-    private $sslVerifyHost = true;
-    /**
-     * @var array
-     */
-    private $guzzleOptions = [];
-    /**
-     * @var bool
-     */
-    private $testMode = false;
+    protected string $username;
 
+    protected string $accessToken;
 
-    /**
-     * Client constructor.
-     *
-     * @param  string  $url
-     * @param  string  $usernameOrAccessToken
-     * @param  string|null  $password
-     * @param  int  $mode
-     *
-     * @throws ParameterValidationException
-     */
+    protected int $mode;
+
+    protected ?string $password;
+
+    protected string $url;
+
+    protected string $path;
+
+    protected string $port;
+
+    protected string $scheme;
+
+    protected string $host;
+
+    protected bool $verbose = false;
+
+    protected int $connectionTimeout = 10;
+
+    protected string $endpointJson = "/json/smsmessaging/";
+
+    protected string $endpointText = "text";
+
+    protected string $endpointBinary = "binary";
+
+    protected bool $sslVerifyHost = true;
+
+    protected array $guzzleOptions = [];
+
+    protected bool $testMode = false;
+
     public function __construct(
         string $url,
         string $usernameOrAccessToken,
-        string $password = null,
+        ?string $password,
         int $mode = AuthenticationMode::USER_PW
     ) {
         $this->initUrl($url);
@@ -111,7 +62,8 @@ class Client
                 "Invalid call of sms.at gateway class. Hostname in wrong format: {$this->url}"
             );
         }
-        if ($mode === AuthenticationMode::USER_PW && (! $usernameOrAccessToken || ! $password) || $mode === AuthenticationMode::ACCESS_TOKEN && ! $usernameOrAccessToken) {
+
+        if ($this->checkAuth($mode, $usernameOrAccessToken, $password)) {
             throw new ParameterValidationException(
                 "Invalid call of sms.at gateway class. Check username/password or token."
             );
@@ -128,35 +80,20 @@ class Client
         }
     }
 
-    /**
-     * @param  Message  $message  message object of type WebSmsCom\TextMessage or BinaryMessage
-     * @param  int|null  $maxSmsPerMessage
-     *
-     * @return Response
-     *
-     * @throws ApiException
-     * @throws AuthorizationFailedException
-     * @throws HttpConnectionException
-     * @throws ParameterValidationException
-     * @throws UnknownResponseException
-     */
-    public function send(Message $message, int $maxSmsPerMessage = null)
+    public function send(Message $message, ?int $maxSmsPerMessage = null): ?Response
     {
-        if (! is_null($maxSmsPerMessage) && $maxSmsPerMessage <= 0) {
+        if ($maxSmsPerMessage !== null && $maxSmsPerMessage <= 0) {
             throw new ParameterValidationException("maxSmsPerMessage cannot be less or equal to 0, try null.");
         }
 
         return $this->doRequest($message, $maxSmsPerMessage);
     }
 
-    /**
-     * @param  string  $url
-     */
-    private function initUrl(string $url)
+    protected function initUrl(string $url): void
     {
         // remove trailing slashes from url
-        $this->url = preg_replace('/\/+$/', '', $url);
-        if (! preg_match("#^http|^https.*#i", $this->url)) {
+        $this->url = rtrim($url, '/');
+        if ( ! str_starts_with($this->url, 'http')) {
             $this->url = 'https://'.$this->url;
         }
 
@@ -164,29 +101,15 @@ class Client
         $this->host = $parsedUrl['host'] ?? '';
         $this->path = $parsedUrl['path'] ?? '';
 
-        $this->scheme = $parsedUrl['scheme'] ?? 'http';
-        $this->port = $parsedUrl['port'] ?? '';
+        $this->scheme = $parsedUrl['scheme'] ?? 'https';
+        $this->port = $parsedUrl['port'] ?? 443;
 
-        if (! $this->port) {
-            $this->port = 443;
-            if ($this->scheme === 'http') {
-                $this->port = 80;
-            }
+        if ($this->scheme === 'http') {
+            $this->port = 80;
         }
     }
 
-    /**
-     * @param  Message  $message
-     * @param  int  $maxSmsPerMessage
-     *
-     * @return Response|null
-     *
-     * @throws ApiException
-     * @throws AuthorizationFailedException
-     * @throws HttpConnectionException
-     * @throws UnknownResponseException
-     */
-    private function doRequest(Message $message, int $maxSmsPerMessage): ?Response
+    protected function doRequest(Message $message, int $maxSmsPerMessage): ?Response
     {
         $client = new \GuzzleHttp\Client(
             array_merge(
@@ -219,14 +142,12 @@ class Client
             $data['maxSmsPerMessage'] = $maxSmsPerMessage;
         }
 
-        if (is_bool($this->testMode)) {
-            $data['test'] = $this->testMode;
-        }
+        $data['test'] = $this->testMode;
 
         $options[RequestOptions::JSON] = $data;
         $options[RequestOptions::HEADERS] = $headers;
-        if (! $this->sslVerifyHost) {
-            // Defaults to true so we need only check for false.
+        if ( ! $this->sslVerifyHost) {
+            // Defaults to true so we need to only check for false.
             // Guzzle Docs: Disable validation entirely (don't do this!).
             $options[RequestOptions::VERIFY] = false;
         }
@@ -245,13 +166,13 @@ class Client
                 );
             }
 
-            if (false === strpos($response->getHeaderLine('Content-Type'), 'application/json')) {
+            if ( ! str_contains($response->getHeaderLine('Content-Type'), 'application/json')) {
                 throw new UnknownResponseException(
                     "Received unknown content type '{$response->getHeaderLine('Content-Type')}'. Content: {$response->getBody()}"
                 );
             }
 
-            $apiResult = json_decode($response->getBody()->getContents());
+            $apiResult = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
             if ($apiResult->statusCode < 2000 || $apiResult->statusCode > 2001) {
                 throw new ApiException($apiResult->statusMessage, $apiResult->statusCode);
             }
@@ -278,73 +199,33 @@ class Client
         }
     }
 
-    /**
-     * @return $this
-     */
-    public function test(): self
+    public function test(bool $test = true): static
     {
-        $this->testMode = true;
+        $this->testMode = $test;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function noTest(): self
-    {
-        $this->testMode = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns version string of this WebSmsCom client
-     *
-     * @return string
-     */
     public function getVersion(): string
     {
         return $this->VERSION;
     }
 
-    /**
-     * Returns username set at WebSmsCom client creation
-     *
-     * @return string
-     */
     public function getUsername(): string
     {
         return $this->username;
     }
 
-    /**
-     * Returns url set at WebSmsCom client creation
-     *
-     * @return string
-     */
     public function getUrl(): string
     {
         return $this->url;
     }
 
-    /**
-     * Returns timeout in seconds
-     *
-     * @return int
-     */
     public function getConnectionTimeout(): int
     {
         return $this->connectionTimeout;
     }
 
-    /**
-     * Set time in seconds for http timeout
-     *
-     * @param  int  $connectionTimeout
-     *
-     * @return Client
-     */
     public function setConnectionTimeout(int $connectionTimeout): Client
     {
         $this->connectionTimeout = $connectionTimeout;
@@ -352,13 +233,6 @@ class Client
         return $this;
     }
 
-    /**
-     * Set verbose to see more information about request (echoes)
-     *
-     * @param  bool  $value
-     *
-     * @return Client
-     */
     public function setVerbose(bool $value): Client
     {
         $this->verbose = $value;
@@ -366,13 +240,6 @@ class Client
         return $this;
     }
 
-    /**
-     * Ignore ssl host security
-     *
-     * @param  bool  $value
-     *
-     * @return Client
-     */
     public function setSslVerifyHost(bool $value): Client
     {
         $this->sslVerifyHost = $value;
@@ -380,11 +247,6 @@ class Client
         return $this;
     }
 
-    /**
-     * @param  array  $guzzleOptions
-     *
-     * @return Client
-     */
     public function setGuzzleOptions(array $guzzleOptions): Client
     {
         $this->guzzleOptions = $guzzleOptions;
@@ -392,51 +254,42 @@ class Client
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getPath(): string
     {
         return $this->path;
     }
 
-    /**
-     * @return string
-     */
     public function getAccessToken(): string
     {
         return $this->accessToken;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * @return int
-     */
     public function getPort(): int
     {
         return $this->port;
     }
 
-    /**
-     * @return string
-     */
     public function getScheme(): string
     {
         return $this->scheme;
     }
 
-    /**
-     * @return string
-     */
     public function getHost(): string
     {
         return $this->host;
+    }
+
+    protected function checkAuth(int $mode, string $usernameOrAccessToken, ?string $password): bool
+    {
+        if ($mode === AuthenticationMode::USER_PW && ( ! $usernameOrAccessToken || ! $password)) {
+            return false;
+        }
+
+        return $mode === AuthenticationMode::ACCESS_TOKEN && ! $usernameOrAccessToken;
     }
 }

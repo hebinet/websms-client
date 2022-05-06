@@ -1,28 +1,14 @@
-<?php namespace WebSms;
+<?php
+namespace WebSms;
 
 use WebSms\Exception\ParameterValidationException;
 
 class BinaryMessage extends Message
 {
+    protected array $messageContent;
 
-    /**
-     * @var array
-     */
-    protected $messageContent;
-    /**
-     * @var bool
-     */
-    protected $userDataHeaderPresent;
+    protected bool $userDataHeaderPresent;
 
-    /**
-     * BinaryMessage constructor.
-     *
-     * @param array $recipientAddressList
-     * @param array $messageContent
-     * @param bool $userDataHeaderPresent
-     *
-     * @throws ParameterValidationException
-     */
     public function __construct(array $recipientAddressList, array $messageContent, bool $userDataHeaderPresent)
     {
         $this->checkRecipientAddressList($recipientAddressList);
@@ -32,32 +18,22 @@ class BinaryMessage extends Message
         $this->recipientAddressList = $recipientAddressList;
     }
 
-    /**
-     * Returns set messageContent segments (array)
-     *
-     * @return array
-     */
-    public function getMessageContent()
+    public function getMessageContent(): array
     {
         return $this->messageContent;
     }
 
     /**
      * Set binary message content (array of base64 encoded binary strings)
-     *
-     * @param $messageContent
      */
-    public function setMessageContent(array $messageContent)
+    public function messageContent(array $messageContent): static
     {
         $this->messageContent = $messageContent;
+
+        return $this;
     }
 
-    /**
-     * Returns set UserDataHeaderPresent flag
-     *
-     * @return bool
-     */
-    public function getUserDataHeaderPresent()
+    public function getUserDataHeaderPresent(): bool
     {
         return $this->userDataHeaderPresent;
     }
@@ -66,11 +42,11 @@ class BinaryMessage extends Message
      * Set boolean userDataHeaderPresent flag
      * When set to true, messageContent segments are expected
      * to contain a UserDataHeader
-     *
-     * @param bool $userDataHeaderPresent
      */
-    public function setUserDataHeaderPresent(bool $userDataHeaderPresent)
+    public function userDataHeaderPresent(bool $userDataHeaderPresent): static
     {
         $this->userDataHeaderPresent = $userDataHeaderPresent;
+
+        return $this;
     }
 }

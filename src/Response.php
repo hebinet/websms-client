@@ -1,90 +1,46 @@
-<?php namespace WebSms;
+<?php
+namespace WebSms;
 
 use Psr\Http\Message\ResponseInterface;
 use stdClass;
 
 class Response
 {
-    /**
-     * @var stdClass
-     */
-    private $apiResult;
-    /**
-     * @var \GuzzleHttp\Psr7\Response
-     */
-    private $httpResponse;
+    protected stdClass $apiResult;
 
+    protected ResponseInterface|\GuzzleHttp\Psr7\Response $httpResponse;
 
-    /**
-     * Response constructor.
-     *
-     * @param stdClass $apiResult
-     * @param ResponseInterface $httpResponse
-     */
     public function __construct(stdClass $apiResult, ResponseInterface $httpResponse)
     {
         $this->apiResult = $apiResult;
         $this->httpResponse = $httpResponse;
     }
 
-    /**
-     * Returns raw content of response
-     *
-     * @return string
-     */
-    public function getRawContent()
+    public function getRawContent(): string
     {
         return (string)$this->httpResponse->getBody();
     }
 
-    /**
-     * Returns received StatusCode of API Response
-     *
-     * @return int
-     */
-    public function getApiStatusCode()
+    public function getApiStatusCode(): int
     {
         return $this->apiResult->statusCode;
     }
 
-    /**
-     * Returns received StatusMessage of API Response
-     *
-     * @return string
-     */
-    public function getApiStatusMessage()
+    public function getApiStatusMessage(): string
     {
         return $this->apiResult->statusMessage;
     }
 
-    /**
-     * Returns received TransferId of API Response for successfully sent Message
-     *
-     * @return string
-     */
-    public function getTransferId()
+    public function getTransferId(): string
     {
         return $this->apiResult->transferId;
     }
 
-    /**
-     * Returns received TransferId of API Response for successfully sent Message
-     *
-     * @return string|null
-     */
-    public function getClientMessageId()
+    public function getClientMessageId(): ?string
     {
         return $this->apiResult->clientMessageId ?? null;
     }
 
-    /**
-     * Magic method to pipe all other method calls to the Guzzle Response Object
-     *
-     * @param string $method
-     * @param array $arguments
-     *
-     * @return mixed
-     */
     public function __call(string $method, array $arguments)
     {
         return call_user_func_array([$this->httpResponse, $method], $arguments);

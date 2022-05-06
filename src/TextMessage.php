@@ -1,48 +1,30 @@
-<?php namespace WebSms;
-
-use WebSms\Exception\ParameterValidationException;
+<?php
+namespace WebSms;
 
 class TextMessage extends Message
 {
-    /**
-     * @var string
-     */
-    protected $messageContent;
+    protected string $messageContent;
 
-    /**
-     * TextMessage constructor.
-     *
-     * @param array $recipientAddressList
-     * @param string $messageContent
-     *
-     * @throws ParameterValidationException
-     */
     public function __construct(array $recipientAddressList, string $messageContent)
     {
         $this->checkRecipientAddressList($recipientAddressList);
 
         $this->messageContent = $messageContent;
         $this->recipientAddressList = $recipientAddressList;
-
     }
 
-    /**
-     * Returns set messageContent
-     *
-     * @return string
-     */
-    public function getMessageContent()
+    public function getMessageContent(): string
     {
         return $this->messageContent;
     }
 
     /**
      * Set utf8 string message text
-     *
-     * @param string $messageContent
      */
-    public function setMessageContent(string $messageContent)
+    public function messageContent(string $messageContent): static
     {
         $this->messageContent = $messageContent;
+
+        return $this;
     }
 }
