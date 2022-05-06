@@ -57,7 +57,7 @@ it('throws an error if max sms is lower or equal to 0', function() {
 
 it('can handle exceptions on send', function(string $exceptionMessage, string $exceptionClass, HandlerStack $stack) {
     $client = new Client('https://api.websms.com/', 'test', '123456');
-    $client->setGuzzleOptions(['handler' => $stack]);
+    $client->guzzleOptions(['handler' => $stack]);
 
     $this->expectException($exceptionClass);
     $this->expectExceptionMessageMatches("/.*?{$exceptionMessage}.*?/i");
@@ -81,7 +81,7 @@ it('can handle exceptions on send', function(string $exceptionMessage, string $e
 
 it('can send', function() {
     $client = new Client('https://api.websms.com/', 'test', '123456');
-    $client->setGuzzleOptions([
+    $client->guzzleOptions([
         'handler' => $this->successHandler(),
     ]);
 
