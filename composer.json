@@ -1,8 +1,8 @@
 {
-  "name": "hebinet/websmscom-php",
+  "name": "hebinet/websms-client",
   "description": "A lightweight PHP-client-library for using websms.com SMS services.",
   "type": "library",
-  "homepage": "https://github.com/hebinet/websmscom-php",
+  "homepage": "https://github.com/hebinet/websms-client",
   "license": "MIT",
   "authors": [
     {
