@@ -20,7 +20,7 @@ But most of all, I did it for fun :)
 
 # Installation
 
-composer require hebinet/websmscom-php
+composer require hebinet/websms-client
 
 # Example
 
